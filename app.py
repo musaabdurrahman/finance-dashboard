@@ -80,18 +80,27 @@ st.divider()
 st.markdown("---")
 st.header("Visualisations Overview")
 st.subheader("Spending by category")
-chart = alt.Chart(filtered_data[filtered_data['Type'] == 'expense']).mark_bar().encode(
-    x=alt.X('Category', sort='-y'),
-    y=alt.Y('Amount', axis=alt.Axis(format='£,.0f')),
+expense_by_cat = (
+    filtered_data[filtered_data['Type'] == 'expense']
+    .groupby('Category', as_index=False)['Amount'].sum()
+)
+chart = alt.Chart(expense_by_cat).mark_bar().encode(
+    x=alt.X('Category:N', sort='-y', title='Category'),
+    y=alt.Y('Amount:Q', title='Total (£)', axis=alt.Axis(format=',.0f')),
 )
 st.altair_chart(chart, use_container_width=True)
-st.subheader("Income by category")
-chart_income = alt.Chart(filtered_data[filtered_data['Type'] == 'income']).mark_bar().encode(
-    x=alt.X('Category', sort='-y'),
-    y=alt.Y('Amount', axis=alt.Axis(format='£,.0f')),
-)
 
+st.subheader("Income by category")
+income_by_cat = (
+    filtered_data[filtered_data['Type'] == 'income']
+    .groupby('Category', as_index=False)['Amount'].sum()
+)
+chart_income = alt.Chart(income_by_cat).mark_bar().encode(
+    x=alt.X('Category:N', sort='-y', title='Category'),
+    y=alt.Y('Amount:Q', title='Total (£)', axis=alt.Axis(format=',.0f')),
+)
 st.altair_chart(chart_income, use_container_width=True)
+
 
 st.subheader("Balance Over Time")
 signed_amount = filtered_data['Amount'].where(
