@@ -71,8 +71,11 @@ st.metric("Total Income", f"£{total_income:,.2f}")
 st.metric("Total Expense", f"£{total_expense:,.2f}")
 st.metric("Balance", f"£{balance:,.2f}")
 
-avg_transaction = filtered_data['Amount'].mean()
-st.metric("Average Transaction", f"£{avg_transaction:,.2f}")
+expenses = filtered_data[filtered_data['Type'] == 'expense']
+st.metric("Average Expense", f"£{expenses['Amount'].mean():,.2f}")
+
+savings_rate = (total_income - total_expense) / total_income * 100 if total_income else 0
+st.metric("Savings Rate", f"{savings_rate:.1f}%")
 
 st.divider()
 
@@ -107,5 +110,6 @@ signed_amount = filtered_data['Amount'].where(
     filtered_data['Type'] == 'income',
     -filtered_data['Amount']
 )
-filtered_data['Balance'] = signed_amount.cumsum()
+OPENING_BALANCE = 2000
+filtered_data['Balance'] = OPENING_BALANCE + signed_amount.cumsum()
 st.line_chart(filtered_data.set_index('Date')['Balance'], use_container_width=True)
